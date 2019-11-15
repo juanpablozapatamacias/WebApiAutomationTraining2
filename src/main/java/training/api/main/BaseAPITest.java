@@ -1,5 +1,8 @@
 package training.api.main;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
@@ -20,24 +23,58 @@ public class BaseAPITest {
 	
 	protected HttpResponse httpResponse;
 	
+	protected Map<String, String> mapPost = new HashMap<String,String>();
+	protected Map<String, String> mapGet = new HashMap<String,String>();
+	
 	public BaseAPITest() {}
 	
 	protected RestAssured getRestAssuredInstance() {
-		if(rest==null) rest = new RestAssured();
+		if(rest==null) 
+			rest = new RestAssured();
 		
 		return rest;
 	}
 	
 	protected BaseURI getBaseURI(String uri, String path){
-		return new BaseURI(uri, path); 
+		if (base == null) 
+			base = new BaseURI(uri, path); 
+		
+		return base;
+	}
+	
+	protected BaseURI getBaseURI(String uri) {
+		if (base == null) 
+			base = new BaseURI(uri); 
+		
+		return base;
 	}
 	
 	protected Response getResponse(RequestSpecification rqSpec, Method met, String arg) {
-		return rqSpec.request(met,arg);
+		Response rsp = null; 
+		try {
+			rsp = rqSpec.request(met,arg);
+			return rsp;
+		}
+		catch(Exception e) {}
+		return null;
 	}
 	
 	protected Response getResponse(RequestSpecification rqSpec, Method met) {
-		return rqSpec.request(met);
+		Response rsp = null; 
+		try {
+			rsp = rqSpec.request(met);
+			return rsp;
+		}
+		catch(Exception e) {}
+		return null;
+	}
+	
+	protected RequestSpecification getHttpRequest(RestAssured rest) {
+		RequestSpecification rs = null;
+		if(rest !=null) 
+			rs = rest.given();
+		
+		return rs;
 	}
 		
 	protected HttpResponse getHttpResponse (Response rs) {

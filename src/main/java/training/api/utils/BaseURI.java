@@ -9,6 +9,10 @@ public class BaseURI {
 		this.baseURI = u;
 		this.basePath = p;
 	}
+	
+	public BaseURI(String u) {
+		this.baseURI = u;
+	}
 
 	public String getBaseURI() {
 		return baseURI;

@@ -3,40 +3,36 @@ package training.api.tests;
 import training.api.main.BaseAPITest;
 import training.api.utils.HttpResponse;
 import training.api.utils.RespUtils;
+import training.api.utils.TestNGRetry;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 
-
 public class TestDemo extends BaseAPITest{
 
-	Map<String, String> mapPost = new HashMap<String,String>();
-	Map<String, String> mapGet = new HashMap<String,String>();
-
-	@BeforeMethod
+	@BeforeTest
 	public void setup() {
 		rest = getRestAssuredInstance();
-		base = getBaseURI("http://dummy.restapiexample.com", "/api/v1/employee/");
-		rest.baseURI = base.getFullBaseURI();
-		httpRequest = rest.given();
+		base = getBaseURI("http://dummy.restapiexample.com");
 	}
 	
-	@Test
+	@Test(retryAnalyzer = TestNGRetry.class)
 	public void httpPostMethod() {
-		base = getBaseURI("http://dummy.restapiexample.com", "/api/v1/create");
-		rest.baseURI = base.getFullBaseURI();
-		httpRequest = rest.given();
+		rest.baseURI = base.getBaseURI() + "/api/v1/create";
+		httpRequest = getHttpRequest(rest);
 		
 		String input = "{"
-				+ "\"name\":\"TestJuanPablo2\","
+				+ "\"name\":\"TestJuanPablo10\","
 				+ "\"salary\":\"123\","
 				+ "\"age\":\"40\","
 				+ "\"id\":\"\""
@@ -56,11 +52,10 @@ public class TestDemo extends BaseAPITest{
 		Assert.assertEquals(status, 200);
 	}
 	
-	@Test(dependsOnMethods="httpPostMethod")
+	@Test(dependsOnMethods="httpPostMethod", retryAnalyzer = TestNGRetry.class)
 	public void httpGetMethod() {
-		base = getBaseURI("http://dummy.restapiexample.com", "/api/v1/employee/");
-		rest.baseURI = base.getFullBaseURI();
-		httpRequest = rest.given();
+		rest.baseURI = base.getBaseURI() + "/api/v1/employee/";
+		httpRequest = getHttpRequest(rest);
 		resp = getResponse(httpRequest, Method.GET, mapPost.get("id"));
 		
 		httpResponse = getHttpResponse(resp);
@@ -74,7 +69,7 @@ public class TestDemo extends BaseAPITest{
 		Assert.assertEquals(status, 200, "Status is failed");
 	}
 	
-	@Test(dependsOnMethods="httpGetMethod")
+	@Test(dependsOnMethods="httpGetMethod", retryAnalyzer = TestNGRetry.class)
 	public void validate(){
 		Assert.assertEquals(mapPost.get("id"),mapGet.get("id"),
 				"Employee ID values do not match in json request and response");
@@ -86,7 +81,7 @@ public class TestDemo extends BaseAPITest{
 				"Employee Age values do not match in json request and response");
 	}
 	
-	@AfterMethod
+	@AfterTest
 	public void teardown() {
 		base.resetBaseURI();
 		base.resetBasePath();
